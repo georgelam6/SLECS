@@ -2,7 +2,7 @@
 
 #include "ECS.h"
 
-int s_componentCounter = 0;
+unsigned int impl_componentCounter = 0;
 
 struct TestComponent {
    int value {10937};
@@ -13,19 +13,20 @@ struct TestComponent2 {
 };
 
 int main(int argc, char const *argv[]) {
-   EntityManager ecs;
+   ECS ecs;
 
    EntityHandle testEnt = ecs.CreateEntity();
-   ecs.AddComponent<TestComponent>(testEnt);;
+   ecs.AddComponent<TestComponent>(testEnt);
    ecs.AddComponent<TestComponent2>(testEnt);
 
+   EntityHandle testEnt2 = ecs.CreateEntity();
+   ecs.AddComponent<TestComponent>(testEnt2);
+   //ecs.GetComponent<TestComponent>(testEnt2);
 
-   for (EntityHandle ent : SystemLoop<TestComponent, TestComponent2>(ecs)) {
-      std::cout << ecs.GetComponent<TestComponent>(ent)->value << '\n';
-   }
+   //for (EntityHandle ent : ECSView<TestComponent>(ecs)) {
+      //std::cout << ecs.GetComponent<TestComponent>(ent)->value << '\n';
+   //}
 
-   ecs.RemoveComponent<TestComponent>(testEnt);
-   ecs.DestroyEntity(testEnt);
 
    return 0;
 }

@@ -4,10 +4,10 @@
 #include <bitset>
 #include <tuple>
 
-extern int s_componentCounter;
+extern unsigned int impl_componentCounter;
 template <typename T>
-int GetComponentID() {
-   static int s_componentID = s_componentCounter++;
+unsigned int GetComponentID() {
+   static unsigned int s_componentID = impl_componentCounter++;
    return s_componentID;
 }
 
@@ -21,16 +21,19 @@ typedef std::bitset<MAX_COMPONENTS> ComponentMask;
 
 
 inline EntityHandle CreateHandleToEntity(EntityIndex index, EntityVersion version) {
-   return ((EntityHandle)index << 32) | ((EntityHandle)version);
+  return ((EntityHandle)index << 32) | ((EntityHandle)version);
 }
+
 inline EntityIndex GetEntityIndex(EntityHandle entity) {
-   return entity >> 32;
+  return entity >> 32;
 }
+
 inline EntityVersion GetEntityVersion(EntityHandle entity) {
-   return (EntityVersion)entity;
+  return (EntityVersion)entity;
 }
+
 inline bool IsEntityValid(EntityHandle entity) {
-   return (entity >> 32) != EntityIndex(-1);
+  return (entity >> 32) != EntityIndex(-1);
 }
 
 #define INVALID_ENTITY CreateHandleToEntity(EntityIndex(-1), 0)
@@ -60,23 +63,29 @@ public:
 };
 
 
-struct EntityManager {
+struct ECS {
 private:
    std::vector<std::pair<EntityHandle, ComponentMask>> m_entities;
    std::vector<ComponentContainer*> m_components;
    std::vector<EntityIndex> m_freeEntities; /* A vector of entities that can be overwritton */
 
 public:
+   ~ECS() {
+      for (size_t i = 0; i < m_components.size(); i++) {
+         delete m_components[i];
+      }
+   }
+
    inline const std::vector<std::pair<EntityHandle, ComponentMask>>& Internal_GetEntities() const {
       return m_entities;
    }
 
    template <typename T>
    T* AddComponent(EntityHandle entity) {
-      int componentID = GetComponentID<T>();
+      unsigned int componentID = GetComponentID<T>();
 
       if (m_entities[GetEntityIndex(entity)].first != entity) {
-         std::cerr << "ECS Error: Attempt to access a deleted entity." << '\n';
+         std::cerr << __FUNCTION__ << ": Attempt to access a deleted entity." << '\n';
          return nullptr;
       }
 
@@ -90,7 +99,7 @@ public:
 
       T* newComponent = new(m_components[componentID]->Get(entity)) T();
 
-      m_entities[entity].second.set(componentID);
+      m_entities[GetEntityIndex(entity)].second.set(componentID);
       return newComponent;
    }
 
@@ -99,12 +108,12 @@ public:
       int componentID = GetComponentID<T>();
 
       if (m_entities[GetEntityIndex(entity)].first != entity) {
-         std::cerr << "ECS Error: Attempt to access a deleted entity." << '\n';
+         std::cerr << __FUNCTION__ << ": Attempt to access a deleted entity." << '\n';
          return nullptr;
       }
 
-      if (!m_entities[entity].second.test(componentID)) {
-         std::cerr << "ECS Error: Component doesn't exist on the requested entity. Returning nullptr from GetComponent(EntityHandle entity) instead." << '\n';
+      if (!m_entities[GetEntityIndex(entity)].second.test(componentID)) {
+         std::cerr << __FUNCTION__ << ": Component doesn't exist on the requested entity. Returning nullptr instead." << '\n';
          return nullptr;
       }
 
@@ -115,7 +124,7 @@ public:
    template <typename T>
    void RemoveComponent(EntityHandle entity) {
       if (m_entities[GetEntityIndex(entity)].first != entity) {
-         std::cerr << "ECS Error: Attempt to access a deleted entity." << '\n';
+         std::cerr << __FUNCTION__ << ": Attempt to access a deleted entity." << '\n';
          return;
       }
 
@@ -137,7 +146,9 @@ public:
       if (!m_freeEntities.empty()) {
          EntityIndex newIndex = m_freeEntities.back();
          m_freeEntities.pop_back();
+
          EntityHandle newEntity = CreateHandleToEntity(newIndex, GetEntityVersion(m_entities[newIndex].first));
+
          m_entities[newIndex].first = newEntity;
          return m_entities[newIndex].first;
       }
@@ -148,26 +159,31 @@ public:
 };
 
 template <typename... ComponentTypes>
-struct SystemLoop {
+struct ECSView {
 private:
-   EntityManager* m_entityManager {nullptr};
+   ECS* m_entityManager {nullptr};
    bool m_all {false};
    ComponentMask m_componentMask;
 public:
-   SystemLoop(EntityManager& manager) : m_entityManager(&manager) {
+   ECSView(ECS& manager) : m_entityManager(&manager) {
       if (sizeof...(ComponentTypes) == 0) {
          m_all = true;
       } else {
          /* Basically loop through all the components and add them to the mask */
-         int componentIDs[] = {0, GetComponentID<ComponentTypes>() ... };
-         for (int i = 1; i < (sizeof...(ComponentTypes) + 1); i++) {
+         unsigned int componentIDs[] = {0, GetComponentID<ComponentTypes>() ... };
+         for (unsigned int i = 1; i < (sizeof...(ComponentTypes) + 1); i++) {
             m_componentMask.set(componentIDs[i]);
          }
       }
    }
 
    struct Iterator {
-      Iterator(EntityManager* manager, EntityIndex index, ComponentMask mask, bool all) :
+      EntityIndex index;
+      ECS* manager;
+      ComponentMask mask;
+      bool all {false};
+
+      Iterator(ECS* manager, EntityIndex index, ComponentMask mask, bool all) :
          manager(manager), index(index), all(all) {}
 
       EntityHandle operator*() const {
@@ -197,11 +213,6 @@ public:
             (all || mask == (mask & manager->Internal_GetEntities()[index].second));
       }
 
-
-      EntityIndex index;
-      EntityManager* manager;
-      ComponentMask mask;
-      bool all {false};
    };
 
    const Iterator begin() const {
