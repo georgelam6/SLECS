@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string>
+
 
 #include "ECS.h"
 
