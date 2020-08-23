@@ -3,7 +3,7 @@ Super Lightweight Entity Component System - A < 500 line single-header ECS
 
 ## Components
 Components are simply C-style structs (ie. without methods)
-```
+```cpp
 struct ExampleComponent {
    int x = 2;
    int y = 5;
@@ -13,7 +13,7 @@ struct ExampleComponent {
 
 ## Entities
 The entity doesn't have a dedicated class, it is simply an id. Entities are stored in a vector by the main ECS class
-```
+```cpp
 ECS ecsManager;
 
 /* EntityHandle is an ID that points to an entity */
@@ -26,7 +26,7 @@ ecsManager.GetComponent<ExampleComponent>(testEnt)->someData = "This is an examp
 
 ## Systems
 The system is an iterator that iterates over entities with specific components
-```
+```cpp
 /* This system loops over all the entities that have ExampleComponent and SomeTestComponent */
 for (EntityHandle ent : System<ExampleComponent, SomeTestComponent>(ecsManager)) {
 
