@@ -5,27 +5,31 @@
 unsigned int impl_componentCounter = 0;
 
 struct TestComponent {
-   int value {10937};
+   int value = 500;
 };
 
 struct TestComponent2 {
-   float value {4.0f};
+   float x = 4.0f;
+   float y = 5.0f;
 };
 
 int main(int argc, char const *argv[]) {
-   ECS ecs;
+   ECS ecsManager;
 
-   EntityHandle testEnt = ecs.CreateEntity();
-   ecs.AddComponent<TestComponent>(testEnt);
-   ecs.AddComponent<TestComponent2>(testEnt);
+   EntityHandle testEnt = ecsManager.CreateEntity();
+   ecsManager.AddComponent<TestComponent>(testEnt);
+   ecsManager.AddComponent<TestComponent2>(testEnt);
 
-   EntityHandle testEnt2 = ecs.CreateEntity();
-   ecs.AddComponent<TestComponent>(testEnt2);
-   ecs.AddComponent<TestComponent2>(testEnt2);
-   ecs.GetComponent<TestComponent>(testEnt2)->value = 10;
+   EntityHandle testEnt2 = ecsManager.CreateEntity();
+   ecsManager.AddComponent<TestComponent>(testEnt2)->value = 10;
+   ecsManager.AddComponent<TestComponent2>(testEnt2)->x = 100;
+   ecsManager.GetComponent<TestComponent2>(testEnt2)->y = 2;
 
-   for (EntityHandle ent : System<TestComponent, TestComponent2>(ecs)) {
-      std::cout << ecs.GetComponent<TestComponent>(ent)->value << '\n';
+   for (EntityHandle ent : System<TestComponent, TestComponent2>(ecsManager)) {
+      std::cout << "\n" << "Entity " << GetEntityIndex(ent) << '\n';
+      std::cout << "TestComponent value: " << ecsManager.GetComponent<TestComponent>(ent)->value << '\n';
+      std::cout << "TestComponent2 x: " << ecsManager.GetComponent<TestComponent2>(ent)->x << '\n';
+      std::cout << "TestComponent2 y: " << ecsManager.GetComponent<TestComponent2>(ent)->y << '\n';
    }
 
    return 0;
