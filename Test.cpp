@@ -2,7 +2,7 @@
 #include <string>
 
 
-#include "ECS.h"
+#include "SLECS.h"
 
 unsigned int impl_componentCounter = 0;
 
