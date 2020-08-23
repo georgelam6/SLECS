@@ -33,7 +33,7 @@ inline EntityVersion GetEntityVersion(EntityHandle entity) {
 }
 
 inline bool IsEntityValid(EntityHandle entity) {
-  return (entity >> 32) != EntityIndex(-1);
+  return GetEntityIndex(entity) != EntityIndex(-1);
 }
 
 #define INVALID_ENTITY CreateHandleToEntity(EntityIndex(-1), 0)
@@ -81,9 +81,15 @@ public:
    }
 
    template <typename T>
+   bool HasComponent(EntityHandle entity) {
+      return m_entities[GetEntityIndex(entity)].second.test(GetComponentID<T>());
+   }
+
+   template <typename T>
    T* AddComponent(EntityHandle entity) {
       unsigned int componentID = GetComponentID<T>();
 
+      //std::cout << m_entities[GetEntityIndex(entity)].first << '\n';
       if (m_entities[GetEntityIndex(entity)].first != entity) {
          std::cerr << __FUNCTION__ << ": Attempt to access a deleted entity." << '\n';
          return nullptr;
@@ -97,7 +103,7 @@ public:
          m_components[componentID] = new ComponentContainer(sizeof(T));
       }
 
-      T* newComponent = new(m_components[componentID]->Get(entity)) T();
+      T* newComponent = new(m_components[componentID]->Get(GetEntityIndex(entity))) T();
 
       m_entities[GetEntityIndex(entity)].second.set(componentID);
       return newComponent;
@@ -117,9 +123,10 @@ public:
          return nullptr;
       }
 
-      T* gotComponent = static_cast<T*>(m_components[componentID]->Get(entity));
+      T* gotComponent = static_cast<T*>(m_components[componentID]->Get(GetEntityIndex(entity)));
       return gotComponent;
    }
+
 
    template <typename T>
    void RemoveComponent(EntityHandle entity) {
@@ -153,24 +160,24 @@ public:
          return m_entities[newIndex].first;
       }
 
-      m_entities.push_back({m_entities.size(), ComponentMask()});
+      m_entities.push_back(std::make_pair(CreateHandleToEntity(m_entities.size(), 0), ComponentMask()));
       return m_entities.back().first;
    }
 };
 
 template <typename... ComponentTypes>
-struct ECSView {
+class System {
 private:
-   ECS* m_entityManager {nullptr};
-   bool m_all {false};
+   ECS* m_ecs;
    ComponentMask m_componentMask;
+   bool m_all = false;
+
 public:
-   ECSView(ECS& manager) : m_entityManager(&manager) {
+   System(ECS& ecs) : m_ecs(&ecs) {
       if (sizeof...(ComponentTypes) == 0) {
          m_all = true;
       } else {
-         /* Basically loop through all the components and add them to the mask */
-         unsigned int componentIDs[] = {0, GetComponentID<ComponentTypes>() ... };
+         unsigned int componentIDs[] = { 0, GetComponentID<ComponentTypes>()... };
          for (unsigned int i = 1; i < (sizeof...(ComponentTypes) + 1); i++) {
             m_componentMask.set(componentIDs[i]);
          }
@@ -178,54 +185,52 @@ public:
    }
 
    struct Iterator {
-      EntityIndex index;
-      ECS* manager;
-      ComponentMask mask;
-      bool all {false};
-
-      Iterator(ECS* manager, EntityIndex index, ComponentMask mask, bool all) :
-         manager(manager), index(index), all(all) {}
+      Iterator(ECS* ecs, EntityIndex index, ComponentMask mask, bool all) :
+         index(index), ecs(ecs), mask(mask), all(all) {}
 
       EntityHandle operator*() const {
-         return manager->Internal_GetEntities()[index].first;
+         return ecs->Internal_GetEntities()[index].first;
       }
 
       bool operator==(const Iterator& other) const {
-         return index == other.index || index == manager->Internal_GetEntities().size();
+         return index == other.index;
       }
-
       bool operator!=(const Iterator& other) const {
-         return index != other.index || index != manager->Internal_GetEntities().size();
-      }
-
-      Iterator& operator++() {
-         while (index < manager->Internal_GetEntities().size() && !ValidIndex()) {
-            index++;
-         }
-         return *this;
+         return index != other.index;
       }
 
       bool ValidIndex() {
          return
-            /* The handle is valid */
-            IsEntityValid(manager->Internal_GetEntities()[index].first) &&
-            /* ...And it has the correct mask */
-            (all || mask == (mask & manager->Internal_GetEntities()[index].second));
+            IsEntityValid(ecs->Internal_GetEntities()[index].first) &&
+            (all || mask == (mask & ecs->Internal_GetEntities()[index].second));
       }
 
+      Iterator& operator++() {
+         do {
+            index++;
+         } while (index < ecs->Internal_GetEntities().size() && !ValidIndex());
+         return *this;
+      }
+
+      EntityIndex index;
+      ECS* ecs;
+      ComponentMask mask;
+      bool all = false;
    };
 
    const Iterator begin() const {
-      int firstIndex = 0;
-      while (firstIndex < m_entityManager->Internal_GetEntities().size() &&
-      (m_componentMask != (m_componentMask & m_entityManager->Internal_GetEntities()[firstIndex].second)
-      || !IsEntityValid(m_entityManager->Internal_GetEntities()[firstIndex].first))) {
-         firstIndex++;
+     int firstIndex = 0;
+     while (firstIndex < m_ecs->Internal_GetEntities().size() &&
+       (m_componentMask != (m_componentMask & m_ecs->Internal_GetEntities()[firstIndex].second)
+         || !IsEntityValid(m_ecs->Internal_GetEntities()[firstIndex].first))) {
+          firstIndex++;
       }
-      return Iterator(m_entityManager, firstIndex, m_componentMask, m_all);
+      return Iterator(m_ecs, firstIndex, m_componentMask, m_all);
    }
 
    const Iterator end() const {
-      return Iterator(m_entityManager, EntityIndex(m_entityManager->Internal_GetEntities().size()), m_componentMask, m_all);
+     return Iterator(m_ecs, EntityIndex(m_ecs->Internal_GetEntities().size()), m_componentMask, m_all);
    }
+
+
 };

@@ -21,12 +21,12 @@ int main(int argc, char const *argv[]) {
 
    EntityHandle testEnt2 = ecs.CreateEntity();
    ecs.AddComponent<TestComponent>(testEnt2);
-   //ecs.GetComponent<TestComponent>(testEnt2);
+   ecs.AddComponent<TestComponent2>(testEnt2);
+   ecs.GetComponent<TestComponent>(testEnt2)->value = 10;
 
-   //for (EntityHandle ent : ECSView<TestComponent>(ecs)) {
-      //std::cout << ecs.GetComponent<TestComponent>(ent)->value << '\n';
-   //}
-
+   for (EntityHandle ent : System<TestComponent, TestComponent2>(ecs)) {
+      std::cout << ecs.GetComponent<TestComponent>(ent)->value << '\n';
+   }
 
    return 0;
 }
