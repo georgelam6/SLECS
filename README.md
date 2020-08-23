@@ -1,4 +1,4 @@
-fox# SLECS
+# SLECS
 Super Lightweight Entity Component System - A < 500 line single-header ECS
 
 ## Components
@@ -24,19 +24,19 @@ ecsManager.AddComponent<ExampleComponent>(testEnt)->x = 5;
 ecsManager.GetComponent<ExampleComponent>(testEnt)->someData = "This is an example";
 ```
 
-### `T* ECS::AddComponent<T>(EntityHandle)`
+#### `T* ECS::AddComponent<T>(EntityHandle)`
 Add a component to an entity, return a pointer to the new component
 
-### `T* ECS::GetComponent<T>(EntityHandle)`
+#### `T* ECS::GetComponent<T>(EntityHandle)`
 Return a pointer to a component on an entity
 
-### `bool ECS::HasComponent<T>(EntityHandle)`
+#### `bool ECS::HasComponent<T>(EntityHandle)`
 Return a bool indicating whether or not an entity has a component
 
-### `void ECS::RemoveComponent<T>(EntityHandle)`
+#### `void ECS::RemoveComponent<T>(EntityHandle)`
 Remove a component from an entity
 
-### `void ECS::DestroyEntity(EntityHandle)`
+#### `void ECS::DestroyEntity(EntityHandle)`
 Destroy an entity and it's components
 
 
