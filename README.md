@@ -16,7 +16,7 @@ The entity doesn't have a dedicated class, it is simply an id. Entities are stor
 ```cpp
 ECS ecsManager;
 
-/* EntityHandle is an ID that points to an entity */
+/* EntityHandle is an ID and a flag in the form of a 64-bit integer that points to an entity */
 EntityHandle testEnt = ecsManager.CreateEntity();
 
 /* Both AddComponent and GetComponent return a pointer to the component */
