@@ -4,7 +4,7 @@
 
 #include "SLECS.h"
 
-unsigned int impl_componentCounter = 0;
+const int MAX_ENTITIES = 100;
 
 struct TestComponent {
    int value = 500;
@@ -26,6 +26,7 @@ int main(int argc, char const *argv[]) {
    ecsManager.AddComponent<TestComponent>(testEnt2)->value = 10;
    ecsManager.AddComponent<TestComponent2>(testEnt2)->x = 100;
    ecsManager.GetComponent<TestComponent2>(testEnt2)->y = 2;
+
 
    for (EntityHandle ent : System<TestComponent, TestComponent2>(ecsManager)) {
       std::cout << "\n" << "Entity " << GetEntityIndex(ent) << '\n';

@@ -29,7 +29,7 @@ SOFTWARE.
 #include <bitset>
 #include <tuple>
 
-extern unsigned int impl_componentCounter;
+static unsigned int impl_componentCounter = 0;
 template <typename T>
 unsigned int GetComponentID() {
    static unsigned int s_componentID = impl_componentCounter++;
@@ -40,8 +40,8 @@ typedef unsigned int EntityIndex;
 typedef unsigned int EntityVersion;
 typedef unsigned long long EntityHandle;
 
-const int MAX_COMPONENTS = 32;
-const int MAX_ENTITIES = 100;
+extern const int MAX_COMPONENTS = 32;
+extern const int MAX_ENTITIES;
 typedef std::bitset<MAX_COMPONENTS> ComponentMask;
 
 
