@@ -2,9 +2,12 @@
 #include <string>
 
 
+#define MAX_ENTITIES 100
+#define MAX_COMPONENTS 32
+
 #include "SLECS.h"
 
-const int MAX_ENTITIES = 100;
+
 
 struct TestComponent {
    int value = 500;
