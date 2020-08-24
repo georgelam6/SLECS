@@ -2,7 +2,7 @@
 Super Lightweight Entity Component System - A < 500 line single-header ECS
 
 ## Prerequisites
-After including `SLECS.h` you must define `const int MAX_ENTITIES = someValue;` in **one** source file.
+After including `SLECS.h`, you must define `const int MAX_ENTITIES = someValue;` in **one** source file.
 
 ## Components
 Components are simply C-style structs (ie. without methods)

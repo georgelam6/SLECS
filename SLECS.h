@@ -20,6 +20,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+ --- NOTES ---
+ - After including this file, you must define `const int MAX_ENTITIES = someValue;` in **one** source file.
+ - Currently tested with CMake 3.16.3, GNU Make 4.2.1 and GCC 9.3 on Ubuntu 20 LTS
 */
 
 
