@@ -1,5 +1,4 @@
 #include <iostream>
-#include <string>
 
 
 #define MAX_ENTITIES 100
@@ -9,11 +8,11 @@
 
 
 
-struct TestComponent {
+struct ExampleComponent {
    int value = 500;
 };
 
-struct TestComponent2 {
+struct AnotherExample {
    float x = 4.0f;
    float y = 5.0f;
 };
@@ -22,20 +21,20 @@ int main(int argc, char const *argv[]) {
    ECS ecsManager;
 
    EntityHandle testEnt = ecsManager.CreateEntity();
-   ecsManager.AddComponent<TestComponent>(testEnt);
-   ecsManager.AddComponent<TestComponent2>(testEnt);
+   ecsManager.AddComponent<ExampleComponent>(testEnt);
+   ecsManager.AddComponent<AnotherExample>(testEnt);
 
    EntityHandle testEnt2 = ecsManager.CreateEntity();
-   ecsManager.AddComponent<TestComponent>(testEnt2)->value = 10;
-   ecsManager.AddComponent<TestComponent2>(testEnt2)->x = 100;
-   ecsManager.GetComponent<TestComponent2>(testEnt2)->y = 2;
+   ecsManager.AddComponent<ExampleComponent>(testEnt2)->value = 10;
+   ecsManager.AddComponent<AnotherExample>(testEnt2)->x = 100;
+   ecsManager.GetComponent<AnotherExample>(testEnt2)->y = 2;
 
 
-   for (EntityHandle ent : System<TestComponent, TestComponent2>(ecsManager)) {
+   for (EntityHandle ent : System<ExampleComponent, AnotherExample>(ecsManager)) {
       std::cout << "\n" << "Entity " << GetEntityIndex(ent) << '\n';
-      std::cout << "TestComponent value: " << ecsManager.GetComponent<TestComponent>(ent)->value << '\n';
-      std::cout << "TestComponent2 x: " << ecsManager.GetComponent<TestComponent2>(ent)->x << '\n';
-      std::cout << "TestComponent2 y: " << ecsManager.GetComponent<TestComponent2>(ent)->y << '\n';
+      std::cout << "ExampleComponent value: " << ecsManager.GetComponent<ExampleComponent>(ent)->value << '\n';
+      std::cout << "AnotherExample x: " << ecsManager.GetComponent<AnotherExample>(ent)->x << '\n';
+      std::cout << "AnotherExample y: " << ecsManager.GetComponent<AnotherExample>(ent)->y << '\n';
    }
 
    return 0;

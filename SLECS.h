@@ -24,7 +24,6 @@ SOFTWARE.
 
  --- NOTES ---
  - After including this file, you must define `const int MAX_ENTITIES = someValue;` in **one** source file.
- - By default, memory is allocated for a maximum of 32 components per entity. This can be changed by editing the value assigned to `MAX_COMPONENTS`
  - Currently tested with CMake 3.16.3, GNU Make 4.2.1 and GCC 9.3 on Ubuntu 20 LTS
 */
 
