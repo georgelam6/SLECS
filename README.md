@@ -3,6 +3,7 @@ Super Lightweight Entity Component System - A < 500 line single-header ECS
 
 ## Prerequisites
 *Before* including `SLECS.h`, you must `#define MAX_ENTITIES 100` and `#define MAX_COMPONENTS 32` in **one** source file.
+You need a compiler with the C++ standard set to C++ 14 or above. It will fail to compile otherwise.
 
 ## Components
 Components are simply C-style structs (ie. without methods)

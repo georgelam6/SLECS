@@ -25,13 +25,16 @@ SOFTWARE.
  --- NOTES ---
  - After including this file, you must define `const int MAX_ENTITIES = someValue;` in **one** source file.
  - Currently tested with CMake 3.16.3, GNU Make 4.2.1 and GCC 9.3 on Ubuntu 20 LTS
+ - YOU MUST USE C++ 14 OR ABOVE. Otherwise it will fail to compile
 */
 
 
 #pragma once
 
+
 #include <vector>
 #include <bitset>
+#include <utility>
 #include <tuple>
 
 static unsigned int impl_componentCounter = 0;
@@ -113,11 +116,10 @@ public:
       return m_entities[GetEntityIndex(entity)].second.test(GetComponentID<T>());
    }
 
-   template <typename T>
-   T* AddComponent(EntityHandle entity) {
+   template <typename T, typename... Args>
+   T* AddComponent(EntityHandle entity, Args... pArgs) {
       unsigned int componentID = GetComponentID<T>();
 
-      //std::cout << m_entities[GetEntityIndex(entity)].first << '\n';
       if (m_entities[GetEntityIndex(entity)].first != entity) {
          std::cerr << __FUNCTION__ << ": Attempt to access a deleted entity." << '\n';
          return nullptr;
@@ -131,7 +133,7 @@ public:
          m_components[componentID] = new ComponentContainer(sizeof(T));
       }
 
-      T* newComponent = new(m_components[componentID]->Get(GetEntityIndex(entity))) T();
+      T* newComponent = new(m_components[componentID]->Get(GetEntityIndex(entity))) T{pArgs...};
 
       m_entities[GetEntityIndex(entity)].second.set(componentID);
       return newComponent;
@@ -154,7 +156,6 @@ public:
       T* gotComponent = static_cast<T*>(m_components[componentID]->Get(GetEntityIndex(entity)));
       return gotComponent;
    }
-
 
    template <typename T>
    void RemoveComponent(EntityHandle entity) {

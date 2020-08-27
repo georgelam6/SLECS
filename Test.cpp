@@ -21,14 +21,13 @@ int main(int argc, char const *argv[]) {
    ECS ecsManager;
 
    EntityHandle testEnt = ecsManager.CreateEntity();
-   ecsManager.AddComponent<ExampleComponent>(testEnt);
+   ecsManager.AddComponent<ExampleComponent>(testEnt, 25);
    ecsManager.AddComponent<AnotherExample>(testEnt);
 
    EntityHandle testEnt2 = ecsManager.CreateEntity();
    ecsManager.AddComponent<ExampleComponent>(testEnt2)->value = 10;
    ecsManager.AddComponent<AnotherExample>(testEnt2)->x = 100;
    ecsManager.GetComponent<AnotherExample>(testEnt2)->y = 2;
-
 
    for (EntityHandle ent : System<ExampleComponent, AnotherExample>(ecsManager)) {
       std::cout << "\n" << "Entity " << GetEntityIndex(ent) << '\n';
