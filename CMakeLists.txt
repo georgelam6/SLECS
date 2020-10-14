@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 
 project(slecs)
 
+set(CMAKE_CXX_STANDARD 11)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS YES)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY bin)
