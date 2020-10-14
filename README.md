@@ -8,9 +8,9 @@ There isn't any struct for the entities - They are all kept as IDs, which are 32
 Components are simply C-style structs (ie. without methods)
 ```cpp
 struct ExampleComponent {
-   int x = 2;
-   int y = 5;
-   std::string someData = "Hello, world";
+	int x = 2;
+	int y = 5;
+	std::string someData = "Hello, world";
 };
 ```
 
