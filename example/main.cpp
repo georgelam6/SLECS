@@ -17,6 +17,7 @@ private:
 public:
 	void Think() {
 		std::cout << "System iteration: " << m_iterations << std::endl;
+		
 		for (const auto& ent : m_entities) {
 			auto component = g_ecs->GetComponent<TestComponent>(ent);
 
@@ -37,6 +38,7 @@ int main(void) {
 	{
 		Signature signature;
 		signature.set(g_ecs->GetComponentType<TestComponent>());
+		g_ecs->SetSystemSignature<TestSystem>(signature);
 	}
 
 	std::vector<EntityHandle> entities(10);
