@@ -76,6 +76,9 @@ int main(void) {
 
 	auto testSystemInstance = g_ecs->RegisterSystem<TestSystem>(/* Constructor arguments can be passed to the system here*/);
 	{
+		// The signature dictates what components the system has access to. Entities
+		// that have components in the signature will automatically be added to the
+		// system's m_entities vector
 		Signature signature;
 		signature.set(g_ecs->GetComponentType<TestComponent>());
 		g_ecs->SetSystemSignature<TestSystem>(signature);
