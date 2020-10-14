@@ -5,13 +5,15 @@ Super Lightweight Entity Component System - written using C++ 11
 There isn't any struct for the entities - They are all kept as IDs, which are 32-bit unsigned integers aliased as `EntityHandle`. Keep in mind that `EntityHandle`s can become invalid if the entity is deleted.
 
 ## Components
-Components are simply C-style structs (ie. without methods)
+Components are simply C-style structs (ie. without methods). They must be registered as components before use
 ```cpp
 struct ExampleComponent {
 	int x = 2;
 	int y = 5;
 	std::string someData = "Hello, world";
 };
+
+g_ecs->RegisterComponent<TestComponent>();
 ```
 
 ## Systems
