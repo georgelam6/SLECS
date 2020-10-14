@@ -2,7 +2,7 @@
 #include <memory>
 #include <vector>
 
-#include <ECS.h>
+#include <SLECS.h>
 
 std::unique_ptr<ECS> g_ecs;
 
