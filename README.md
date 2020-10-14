@@ -1,6 +1,9 @@
 # SLECS
 Super Lightweight Entity Component System - written using C++ 11
 
+## Entities
+There isn't any struct for the entities - They are all kept as IDs, which are 32-bit unsigned integers aliased as `EntityHandle`. Keep in mind that `EntityHandle`s can become invalid if the entity is deleted.
+
 ## Components
 Components are simply C-style structs (ie. without methods)
 ```cpp
